@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
+type LoginProps = {
+    onLogin: (username: string, password: string) => void;
+};
 
-const Login = ({ onLogin}) => {
+const Login = ({ onLogin }: LoginProps) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
