@@ -6,6 +6,7 @@ import InventoryList from "../../components/InventoryList"
 import DeliveryTracking from '../../components/DeliveryTracking';
 import Reports from '../../components/Reports';
 import { InventoryItem } from '../types/InventoryTypes';
+import InventoryUpdate from '../../components/InventoryUpdate';
 
 
 const InventoryScreen = () => {
@@ -26,6 +27,8 @@ const InventoryScreen = () => {
                 return <DeliveryTracking />;
             case 'reports':
                 return <Reports />;
+            case 'update': // New case for updating inventory
+                return <InventoryUpdate  products={dummyInventoryItems} />;
             default:
                 return null;
         }
@@ -38,6 +41,7 @@ const InventoryScreen = () => {
                 <Button title="Add Item" onPress={() => setView('form')} />
                 <Button title="Upload File" onPress={() => setView('upload')} />
                 <Button title="View Inventory" onPress={() => setView('list')} />
+                <Button title="Update Inventory" onPress={() => setView('update')} /> 
                 <Button title="Track Deliveries" onPress={() => setView('delivery')} />
                 <Button title="Generate Reports" onPress={() => setView('reports')} />
             </View>

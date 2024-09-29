@@ -72,7 +72,6 @@ const InventoryForm = () => {
         value={String(quantity)}
         onChangeText={(value) => setQuantity(Number(value))}
         keyboardType="numeric"
-
       />
 
       <TextInput
