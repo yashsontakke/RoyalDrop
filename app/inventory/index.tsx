@@ -20,7 +20,7 @@ const InventoryScreen = () => {
                 return <InventoryUpload />;
             case 'list':
                 return (
-                    <InventoryList />
+                    <InventoryList products={dummyInventoryItems} />
                 );
             case 'delivery':
                 return <DeliveryTracking />;
@@ -63,3 +63,96 @@ const styles = StyleSheet.create({
 });
 
 export default InventoryScreen;
+
+const dummyInventoryItems : InventoryItem[] = [
+    {
+        id: '1',
+        productName: 'Apples',
+        productCategory: 'Fruits',
+        quantity: 100,
+        expiryDate: '2024-10-01',
+        isPerishable: true,
+        isDamaged: false,
+    },
+    {
+        id: '2',
+        productName: 'Canned Beans',
+        productCategory: 'Canned Goods',
+        quantity: 50,
+        expiryDate: '2025-03-15',
+        isPerishable: false,
+        isDamaged: false,
+    },
+    {
+        id: '3',
+        productName: 'Milk',
+        productCategory: 'Dairy',
+        quantity: 20,
+        expiryDate: '2024-09-30',
+        isPerishable: true,
+        isDamaged: false,
+    },
+    {
+        id: '4',
+        productName: 'Bread',
+        productCategory: 'Bakery',
+        quantity: 10,
+        expiryDate: '2024-09-29',
+        isPerishable: true,
+        isDamaged: true,
+    },
+    {
+        id: '5',
+        productName: 'Cereal',
+        productCategory: 'Breakfast',
+        quantity: 30,
+        expiryDate: '2025-05-10',
+        isPerishable: false,
+        isDamaged: false,
+    },
+    {
+        id: '6',
+        productName: 'Chicken Breast',
+        productCategory: 'Meat',
+        quantity: 15,
+        expiryDate: '2024-09-25',
+        isPerishable: true,
+        isDamaged: false,
+    },
+    {
+        id: '7',
+        productName: 'Rice',
+        productCategory: 'Grains',
+        quantity: 200,
+        expiryDate: '2026-01-01',
+        isPerishable: false,
+        isDamaged: false,
+    },
+    {
+        id: '8',
+        productName: 'Tomatoes',
+        productCategory: 'Vegetables',
+        quantity: 50,
+        expiryDate: '2024-10-05',
+        isPerishable: true,
+        isDamaged: true,
+    },
+    {
+        id: '9',
+        productName: 'Yogurt',
+        productCategory: 'Dairy',
+        quantity: 25,
+        expiryDate: '2024-10-15',
+        isPerishable: true,
+        isDamaged: false,
+    },
+    {
+        id: '10',
+        productName: 'Peanut Butter',
+        productCategory: 'Condiments',
+        quantity: 40,
+        expiryDate: '2025-12-31',
+        isPerishable: false,
+        isDamaged: false,
+    },
+];

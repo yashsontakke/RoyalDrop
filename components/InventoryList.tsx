@@ -1,76 +1,99 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { InventoryItem } from '../app/types/InventoryTypes';
+import React, { useState } from 'react';
+import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 
-  
-  const InventoryList: React.FC= () => {
-  const renderItem = ({ item }:{ item: InventoryItem }) => (
-    <View style={styles.item}>
-      <Text style={styles.itemText}>Product Name: {item.productName}</Text>
-      <Text style={styles.itemText}>Category: {item.category}</Text>
-      <Text style={styles.itemText}>Quantity: {item.quantity}</Text>
-      <Text style={styles.itemText}>Expiry Date: {item.expiryDate}</Text>
-      <Text style={styles.itemText}>Status: {item.isDamaged ? 'Damaged' : 'Not Damaged'}</Text>
-    </View>
-  );
+import { Picker } from '@react-native-picker/picker';
+import { Checkbox } from 'expo-checkbox'; // Update this line
+// Dummy product data
+
+import { InventoryItem } from '../app/types/InventoryTypes';
+// Define the props to accept products array
+type InventoryListProps = {
+  products: InventoryItem[];
+};
+
+const InventoryList = ({ products }: InventoryListProps) => {
+  const [showPerishable, setShowPerishable] = useState(false);
+  const [showDamaged, setShowDamaged] = useState(false);
+  const [showExpired, setShowExpired] = useState(false);
+
+    // Function to check if a product is expired based on expiryDate
+    const isExpired = (expiryDate: string): boolean => {
+      const currentDate = new Date();
+      const productExpiryDate = new Date(expiryDate);
+      return productExpiryDate < currentDate;
+    };
+
+  // Filtering Logic
+  const filteredProducts = products.filter(product => {
+    let isIncluded = true;
+    if (showPerishable) {
+      isIncluded = isIncluded && product.isPerishable;
+    }
+    if (showDamaged) {
+      isIncluded = isIncluded && product.isDamaged;
+    }
+    if (showExpired) {
+      isIncluded = isIncluded && isExpired(product.expiryDate);
+    }
+    return isIncluded;
+  });
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Inventory List</Text>
-      <FlatList
-        data={inventoryData}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-      />
+    {/* Filter options */}
+    <View style={styles.filterOption}>
+      <Checkbox value={showPerishable} onValueChange={setShowPerishable} />
+      <Text>Perishable</Text>
     </View>
+    <View style={styles.filterOption}>
+      <Checkbox value={showDamaged} onValueChange={setShowDamaged} />
+      <Text>Damaged</Text>
+    </View>
+    <View style={styles.filterOption}>
+      <Checkbox value={showExpired} onValueChange={setShowExpired} />
+      <Text>Expired</Text>
+    </View>
+
+    {/* Display filtered products */}
+    <FlatList
+      data={filteredProducts}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <View style={styles.productItem}>
+          <Text style={styles.productName}>Product Name: {item.productName}</Text>
+          <Text>Category: {item.productCategory}</Text>
+          <Text>Quantity: {item.quantity}</Text>
+          <Text>Expiry Date: {item.expiryDate}</Text>
+          <Text>Perishable: {item.isPerishable ? 'Yes' : 'No'}</Text>
+          <Text>Damaged: {item.isDamaged ? 'Yes' : 'No'}</Text>
+        </View>
+      )}
+    />
+  </View>
   );
 };
 
-const inventoryData = [
-    {
-      id: 1,
-      productName: 'Apple',
-      category: 'Fruits',
-      quantity: 50,
-      expiryDate: '2024-10-01',
-      isDamaged: false,
-    },
-    {
-      id: 2,
-      productName: 'Milk',
-      category: 'Dairy',
-      quantity: 30,
-      expiryDate: '2024-09-15',
-      isDamaged: true,
-    },
-    {
-      id: 3,
-      productName: 'Bread',
-      category: 'Bakery',
-      quantity: 20,
-      expiryDate: '2024-09-10',
-      isDamaged: false,
-    },
-    // Add more items as needed
-  ];
-  
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,  // Ensures the container takes full screen height
     padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
   },
-  item: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+  productItem: {
+    padding: 15,
+    marginVertical: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
   },
-  itemText: {
+  productName: {
+    fontWeight: 'bold',
     fontSize: 16,
   },
 });
