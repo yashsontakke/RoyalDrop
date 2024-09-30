@@ -71,9 +71,18 @@ const InventoryForm = () => {
     try {
       const response = await axios.post('http://localhost:8080/api/inventory/create', inventoryData);
       Alert.alert("Success", JSON.stringify(response.data)); // Show success message
+      alert("Inventory item added successfully");
+      setProductName('');
+      setProductCategory('');
+      setQuantity(0);
+      setExpiryDate('');
+      setIsPerishable(false);
+      setIsDamaged(false);
+      setFile(null);
     } catch (error) {
       console.error('Error:', error);
       Alert.alert("Error", "There was an error submitting your data."); // Show error message
+      alert("There was an error submitting your data.");
     }
   };
 
