@@ -114,29 +114,29 @@ const InventoryForm = () => {
         }}
         keyboardType="numeric"
       />
-  <View style={styles.container}>
-      <TouchableOpacity onPress={showDatepicker} style={styles.button}>
-        <Text style={styles.buttonText}>Select Expiry Date</Text>
-      </TouchableOpacity>
-      <Text style={styles.dateText}>Selected Date: {formatDate(date)}</Text>
-      {Platform.OS === 'web' ? (
-        <input
-          type="date"
-          value={formatDate(date)}
-          onChange={handleWebDateChange}
-          style={styles.webDatePicker}
-        />
-      ) : show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode="date"
-          is24Hour={true}
-          display="default"
-          onChange={onChange}
-        />
-      )}
-    </View>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={showDatepicker} style={styles.button}>
+          <Text style={styles.buttonText}>Select Expiry Date</Text>
+        </TouchableOpacity>
+        <Text style={styles.dateText}>Selected Date: {formatDate(date)}</Text>
+        {Platform.OS === 'web' ? (
+          <input
+            type="date"
+            value={formatDate(date)}
+            onChange={handleWebDateChange}
+            style={styles.webDatePicker}
+          />
+        ) : show && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={date}
+            mode="date"
+            is24Hour={true}
+            display="default"
+            onChange={onChange}
+          />
+        )}
+      </View>
       <View style={styles.checkboxContainer}>
         <Checkbox
           value={isPerishable}
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     marginLeft: 10,
-  },button: {
+  }, button: {
     backgroundColor: '#007AFF',
     padding: 10,
     borderRadius: 5,

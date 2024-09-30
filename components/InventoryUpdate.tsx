@@ -2,28 +2,60 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
 import { InventoryItem } from '../app/types/InventoryTypes';
 import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
+
 type InventoryListProps = {
     products: InventoryItem[];
-};    
+};
 
 const InventoryUpdate = ({ products }: InventoryListProps) => {
     const [productId, setProductId] = useState('');
-    const [deliveryAgentId, setDeliveryAgentId] = useState('');
+    const [isProductValid, setIsProductValid] = useState(false);
+    const [isAgentValid, setIsAgentValid] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<InventoryItem | null>(null);
     const [deliveryAction, setDeliveryAction] = useState('');
     const [quantity, setQuantity] = useState('');
+    const [deliveryAgentId, setDeliveryAgentId] = useState('');
 
-    const searchProductById = () => {
-        const product = products.find(item => item.id === productId);
-        if (product) {
-            setSelectedProduct(product);
+    const validateProductId = async () => {
+        const productResponse = await fetch(`http://localhost:8080/api/inventory/${productId}`);
+
+        if (productResponse.ok) {
+            const productData = await productResponse.json();
+            console.log(productData);
+            setSelectedProduct(productData);
+            setIsProductValid(true);
+            Alert.alert('Success', 'Product ID is valid. Please enter Delivery Agent ID to validate.');
         } else {
-            Alert.alert('Product not found');
+
+            Alert.alert('Error', 'Product ID is not valid.');
             setSelectedProduct(null);
+            setIsProductValid(false);
         }
     };
 
-    const updateDeliveryStatus = () => {
+    const validateDeliveryAgentId = async () => {
+        if (!isProductValid) {
+            Alert.alert('Error', 'Please validate the Product ID first.');
+            return;
+        }
+
+        const agentResponse = await fetch(`http://localhost:8080/api/delivery-agents/${deliveryAgentId}`);
+
+
+        if (agentResponse.ok) {
+            const agentData = await agentResponse.json();
+            console.log(agentData);
+            console.log("coming here");
+            setIsAgentValid(true);
+            Alert.alert('Success', 'Delivery Agent ID is valid. You can now update delivery status.');
+        } else {
+            Alert.alert('Error', 'Delivery Agent ID is not valid.');
+            setIsAgentValid(false);
+        }
+    };
+
+    const updateDeliveryStatus = async () => {
         if (selectedProduct) {
             const qty = parseInt(quantity, 10);
             if (isNaN(qty) || qty <= 0) {
@@ -34,24 +66,62 @@ const InventoryUpdate = ({ products }: InventoryListProps) => {
             if (deliveryAction === 'out') {
 
                 if (qty > selectedProduct.quantity) {
+                    alert('Quantity exceeds available stock');
                     Alert.alert('Quantity exceeds available stock');
+
                     return;
                 }
 
-                Alert.alert(`Product ${selectedProduct.productName} taken out for delivery by Agent ID: ${deliveryAgentId}`);
+                // Send request to decrease product quantity using axios
+                try {
+                    const response = await axios.post('http://localhost:8080/api/inventory/out-for-delivery', {
+                        productId: selectedProduct.id,
+                        agentId: deliveryAgentId,
+                        quantity: qty,
+                    });
+
+                    if (response.status === 200) {
+                        alert('Delivery status updated successfully');
+                    } else {
+                        alert(`Failed to update delivery status: ${response.data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating delivery status');
+                }
+                setProductId('');
+                setDeliveryAgentId('');
+                setSelectedProduct(null);
+
                 // Logic to decrease quantity if necessary
             } else if (deliveryAction === 'returned') {
-                Alert.alert(`Product ${selectedProduct.productName} returned to warehouse by Agent ID: ${deliveryAgentId}`);
-                // Logic to increase quantity if necessary
+                try {
+                    const response = await axios.post('http://localhost:8080/api/inventory/returned-to-warehouse', {
+                        productId: selectedProduct.id,
+                        agentId: deliveryAgentId,
+                        quantity: qty,
+                    });
+
+                    if (response.status === 200) {
+                        alert('Return status updated successfully');
+                    } else {
+                        alert(`Failed to update return status: ${response.data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating return status');
+                }
+                setProductId('');
+                setDeliveryAgentId('');
+                setSelectedProduct(null);
             } else {
+                alert('Please select a delivery action');
                 Alert.alert('Please select a delivery action');
             }
 
             // Reset states after update
-            setProductId('');
-            setDeliveryAgentId('');
             setDeliveryAction('');
-            setSelectedProduct(null);
+            // setSelectedProduct(null);
             setQuantity('');
         }
     };
@@ -65,14 +135,19 @@ const InventoryUpdate = ({ products }: InventoryListProps) => {
                 value={productId}
                 onChangeText={setProductId}
             />
-            <TextInput
-                style={styles.input}
-                placeholder="Enter Delivery Agent ID"
-                value={deliveryAgentId}
-                onChangeText={setDeliveryAgentId}
-            />
-            <Button title="Search" onPress={searchProductById} />
-            {selectedProduct && (
+            <Button title="Validate Product ID" onPress={validateProductId} />
+            {isProductValid && (
+                <View>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter Delivery Agent ID"
+                        value={deliveryAgentId}
+                        onChangeText={setDeliveryAgentId}
+                    />
+                    <Button title="Validate Delivery Agent ID" onPress={validateDeliveryAgentId} />
+                </View>
+            )}
+            {isAgentValid && selectedProduct && (
                 <View style={styles.productInfoContainer}>
                     <Text style={styles.productInfo}>Product Name: {selectedProduct.productName}</Text>
                     <Text style={styles.productInfo}>Current Quantity: {selectedProduct.quantity}</Text>
